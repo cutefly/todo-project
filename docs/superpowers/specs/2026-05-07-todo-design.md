@@ -117,7 +117,7 @@ todo-project/
 |--------|------|------|
 | GET | `/api/categories` | 카테고리 목록 |
 | POST | `/api/categories` | 새 카테고리 생성 |
-| DELETE | `/api/categories/[id]` | 카테고리 삭제 |
+| DELETE | `/api/categories/[id]` | 카테고리 삭제 (연결된 할 일의 `categoryId`는 `null`로 설정) |
 
 **요청 예시 (POST /api/todos)**
 ```json
