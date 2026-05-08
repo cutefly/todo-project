@@ -1,9 +1,13 @@
+// app/layout.tsx
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Noto_Sans_KR } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const notoSansKR = Noto_Sans_KR({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+})
 
 export const metadata: Metadata = {
   title: 'MyTodo',
@@ -20,9 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body
-        className={`${inter.className} bg-gray-50 dark:bg-[#0f0f1a] text-gray-900 dark:text-gray-100 min-h-screen`}
-      >
+      <body className={`${notoSansKR.className} bg-spotify-base text-white min-h-screen`}>
         {children}
         <Toaster position="bottom-right" />
       </body>

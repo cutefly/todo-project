@@ -1,19 +1,28 @@
+// app/page.tsx
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import toast from 'react-hot-toast'
 import type { Category, Priority, Todo, View } from '@/types'
 import { TodoList } from '@/components/TodoList'
 import { AddTodoForm } from '@/components/AddTodoForm'
-import { Sidebar } from '@/components/Sidebar'
+import { IconSidebar } from '@/components/IconSidebar'
+import { LibraryPanel } from '@/components/LibraryPanel'
+import { ProgressBar } from '@/components/ProgressBar'
 import { BottomTabBar } from '@/components/BottomTabBar'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 const PRIORITY_OPTIONS: { value: Priority | null; label: string }[] = [
-  { value: null, label: '전체' },
-  { value: 'HIGH', label: '높음' },
+  { value: null,     label: '전체' },
+  { value: 'HIGH',   label: '높음' },
   { value: 'MEDIUM', label: '중간' },
-  { value: 'LOW', label: '낮음' },
+  { value: 'LOW',    label: '낮음' },
 ]
+
+const VIEW_LABELS: Record<View, string> = {
+  all:      '전체 할 일',
+  today:    '오늘 할 일',
+  upcoming: '예정 할 일',
+}
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([])
@@ -22,6 +31,7 @@ export default function Home() {
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
   const [priorityFilter, setPriorityFilter] = useState<Priority | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [showMobileLibrary, setShowMobileLibrary] = useState(false)
   const [loading, setLoading] = useState(true)
 
   const fetchTodos = useCallback(async () => {
@@ -29,7 +39,6 @@ export default function Home() {
     if (activeView !== 'all') params.set('view', activeView)
     if (activeCategoryId) params.set('categoryId', activeCategoryId)
     if (priorityFilter) params.set('priority', priorityFilter)
-
     const res = await fetch(`/api/todos?${params}`)
     if (!res.ok) { toast.error('할 일을 불러오지 못했습니다'); return }
     setTodos(await res.json())
@@ -99,31 +108,38 @@ export default function Home() {
   const handleViewChange = (view: View) => {
     setActiveView(view)
     setActiveCategoryId(null)
+    setShowMobileLibrary(false)
   }
 
   const handleCategoryChange = (id: string | null) => {
     setActiveCategoryId(id)
     setActiveView('all')
+    setShowMobileLibrary(false)
   }
 
+  const completedCount = todos.filter((t) => t.completed).length
+  const activeCategory = categories.find((c) => c.id === activeCategoryId) ?? null
+  const currentTitle = activeCategory?.name ?? VIEW_LABELS[activeView]
+
   return (
-    <div className="flex flex-col h-screen">
-      <header className="bg-[#1a1a2e] border-b border-[#2d2d4e] px-4 py-3 flex items-center justify-between shrink-0">
-        <span className="text-violet-400 font-bold text-base">✓ MyTodo</span>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-violet-600 hover:bg-violet-500 text-white text-sm px-3 py-1.5 rounded-full transition-colors"
-          >
-            + 새 할 일
-          </button>
-        </div>
+    <div className="flex flex-col h-screen bg-spotify-base">
+      {/* Mobile header */}
+      <header className="md:hidden bg-black px-4 py-3 flex items-center justify-between shrink-0">
+        <span className="text-spotify-green font-black text-lg">✓</span>
+        <span className="text-sp-base font-bold text-white">{currentTitle}</span>
+        <ThemeToggle />
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
+        <IconSidebar
+          activeView={activeView}
+          activeCategoryId={activeCategoryId}
+          onViewChange={handleViewChange}
+        />
+
+        <LibraryPanel
           categories={categories}
+          totalTodos={todos.length}
           activeView={activeView}
           activeCategoryId={activeCategoryId}
           onViewChange={handleViewChange}
@@ -131,33 +147,113 @@ export default function Home() {
           onAddCategory={handleAddCategory}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 pb-20 md:pb-4">
-          <div className="flex gap-2 mb-4 flex-wrap items-center">
-            <span className="text-xs text-gray-500">우선순위:</span>
-            {PRIORITY_OPTIONS.map(({ value, label }) => (
-              <button
-                key={label}
-                onClick={() => setPriorityFilter(value)}
-                className={`text-xs px-3 py-1 rounded-full transition-colors ${
-                  priorityFilter === value
-                    ? 'bg-indigo-950 text-violet-400'
-                    : 'text-gray-500 hover:text-gray-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <div className="px-5 pt-5 pb-3 shrink-0">
+            <h1 className="text-sp-xl font-bold text-white mb-3">{currentTitle}</h1>
+            <div className="flex gap-2 flex-wrap">
+              {PRIORITY_OPTIONS.map(({ value, label }) => (
+                <button
+                  key={label}
+                  onClick={() => setPriorityFilter(value)}
+                  className={`text-sp-xs px-3 py-1 rounded-pill transition-colors font-bold ${
+                    priorityFilter === value
+                      ? 'bg-spotify-elevated text-white'
+                      : 'bg-transparent text-spotify-muted border border-spotify-border hover:text-white'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center py-16 text-gray-600 text-sm">불러오는 중...</div>
-          ) : (
-            <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} />
-          )}
+          <div className="flex-1 overflow-y-auto px-3 pb-20 md:pb-4">
+            {loading ? (
+              <div className="flex justify-center py-16 text-spotify-muted text-sp-sm">
+                불러오는 중...
+              </div>
+            ) : (
+              <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} />
+            )}
+          </div>
         </main>
       </div>
 
-      <BottomTabBar activeView={activeView} onViewChange={handleViewChange} />
+      <ProgressBar
+        activeView={activeView}
+        categoryName={activeCategory?.name ?? null}
+        total={todos.length}
+        completed={completedCount}
+        onAdd={() => setShowForm(true)}
+      />
+
+      <BottomTabBar
+        activeView={activeView}
+        activeCategoryId={activeCategoryId}
+        onViewChange={handleViewChange}
+        onCategoryOpen={() => setShowMobileLibrary(true)}
+      />
+
+      {/* Mobile category sheet */}
+      {showMobileLibrary && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/70 z-30"
+          onClick={() => setShowMobileLibrary(false)}
+        >
+          <div
+            className="absolute bottom-0 left-0 right-0 bg-spotify-base rounded-t-xl max-h-[70vh] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-spotify-card">
+              <span className="text-sp-base font-bold text-white">내 라이브러리</span>
+              <button onClick={() => setShowMobileLibrary(false)} className="text-spotify-muted hover:text-white text-xl">✕</button>
+            </div>
+            <div className="overflow-y-auto p-2 pb-6">
+              <button
+                onClick={() => handleCategoryChange(null)}
+                className={`w-full flex items-center gap-3 px-2 py-2 rounded transition-colors mb-1 ${
+                  !activeCategoryId ? 'bg-spotify-elevated' : 'hover:bg-spotify-card'
+                }`}
+              >
+                <div className="w-9 h-9 rounded bg-spotify-card flex items-center justify-center shrink-0 text-base">⊞</div>
+                <div className="text-left">
+                  <p className="text-sp-sm font-bold text-white">전체 할 일</p>
+                  <p className="text-sp-xs text-spotify-muted">{todos.length}개 항목</p>
+                </div>
+              </button>
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.id)}
+                  className={`w-full flex items-center gap-3 px-2 py-2 rounded transition-colors mb-1 ${
+                    activeCategoryId === cat.id ? 'bg-spotify-elevated' : 'hover:bg-spotify-card'
+                  }`}
+                >
+                  <div
+                    className="w-9 h-9 rounded shrink-0 flex items-center justify-center text-sp-xs font-bold text-white"
+                    style={{ background: cat.color }}
+                  >
+                    {cat.name.charAt(0)}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sp-sm font-bold text-white">{cat.name}</p>
+                    <p className="text-sp-xs text-spotify-muted">카테고리</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile FAB */}
+      <button
+        className="md:hidden fixed bottom-20 right-4 w-12 h-12 rounded-circle bg-spotify-green text-black flex items-center justify-center text-2xl font-bold shadow-spotify-heavy z-20"
+        onClick={() => setShowForm(true)}
+        aria-label="새 할 일 추가"
+      >
+        +
+      </button>
 
       {showForm && (
         <AddTodoForm

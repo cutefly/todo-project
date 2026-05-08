@@ -1,3 +1,4 @@
+// components/ThemeToggle.tsx
 'use client'
 import { useTheme } from '@/hooks/useTheme'
 
@@ -7,7 +8,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label="테마 전환"
-      className="text-gray-400 hover:text-gray-200 transition-colors text-sm"
+      className="w-7 h-7 rounded-circle bg-spotify-elevated flex items-center justify-center text-spotify-muted hover:text-white transition-colors text-sm"
     >
       {theme === 'dark' ? '☀' : '☾'}
     </button>

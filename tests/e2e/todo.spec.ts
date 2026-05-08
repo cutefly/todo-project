@@ -1,3 +1,4 @@
+// tests/e2e/todo.spec.ts
 import { test, expect } from '@playwright/test'
 
 test.describe('할 일 추가', () => {
@@ -6,19 +7,19 @@ test.describe('할 일 추가', () => {
   })
 
   test('새 할 일을 추가하면 목록에 표시된다', async ({ page }) => {
-    await page.click('button:has-text("+ 새 할 일")')
+    await page.click('[aria-label="새 할 일 추가"]')
     await page.fill('input[placeholder="할 일을 입력하세요"]', 'E2E 테스트 할 일')
     await page.getByRole('button', { name: '추가', exact: true }).click()
     await expect(page.locator('text=E2E 테스트 할 일').first()).toBeVisible()
   })
 
   test('빈 제목으로는 추가 버튼이 비활성화된다', async ({ page }) => {
-    await page.click('button:has-text("+ 새 할 일")')
+    await page.click('[aria-label="새 할 일 추가"]')
     await expect(page.getByRole('button', { name: '추가', exact: true })).toBeDisabled()
   })
 
   test('취소 버튼을 누르면 모달이 닫힌다', async ({ page }) => {
-    await page.click('button:has-text("+ 새 할 일")')
+    await page.click('[aria-label="새 할 일 추가"]')
     await expect(page.locator('form h2')).toBeVisible()
     await page.click('button:has-text("취소")')
     await expect(page.locator('form h2')).not.toBeVisible()
@@ -28,15 +29,12 @@ test.describe('할 일 추가', () => {
 test.describe('할 일 완료 토글', () => {
   test('체크박스 클릭 시 완료 상태로 변경된다', async ({ page }) => {
     await page.goto('/')
-    // 할 일 추가
-    await page.click('button:has-text("+ 새 할 일")')
+    await page.click('[aria-label="새 할 일 추가"]')
     await page.fill('input[placeholder="할 일을 입력하세요"]', '완료 테스트')
     await page.getByRole('button', { name: '추가', exact: true }).click()
 
-    // 완료 토글
     const todoItem = page.locator('[aria-label="완료"]').first()
     await todoItem.click()
-    // 토글된 항목의 부모 컨테이너에서 p 태그 확인
     const toggledContainer = page.locator('[aria-label="완료 취소"]').first().locator('..')
     await expect(toggledContainer.locator('p').first()).toHaveCSS('text-decoration-line', 'line-through')
   })
@@ -45,7 +43,7 @@ test.describe('할 일 완료 토글', () => {
 test.describe('필터링', () => {
   test('높음 우선순위 필터 클릭 시 해당 항목만 표시된다', async ({ page }) => {
     await page.goto('/')
-    await page.click('button:has-text("+ 새 할 일")')
+    await page.click('[aria-label="새 할 일 추가"]')
     await page.fill('input[placeholder="할 일을 입력하세요"]', '높음 우선순위 할 일')
     await page.selectOption('select', { value: 'HIGH' })
     await page.getByRole('button', { name: '추가', exact: true }).click()
@@ -82,6 +80,6 @@ test.describe('모바일 레이아웃', () => {
   test('하단 탭 클릭 시 뷰가 전환된다', async ({ page }) => {
     await page.goto('/')
     await page.click('nav button:has-text("오늘")')
-    await expect(page.locator('nav button:has-text("오늘") span').last()).toHaveCSS('color', 'rgb(167, 139, 250)')
+    await expect(page.locator('nav button:has-text("오늘") span').last()).toHaveCSS('color', 'rgb(30, 215, 96)')
   })
 })

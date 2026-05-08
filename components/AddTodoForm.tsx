@@ -1,3 +1,4 @@
+// components/AddTodoForm.tsx
 'use client'
 import { useState } from 'react'
 import type { Category, Priority } from '@/types'
@@ -12,6 +13,12 @@ interface AddTodoFormProps {
   }) => Promise<boolean>
   onClose: () => void
 }
+
+const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
+  { value: 'HIGH',   label: '높음' },
+  { value: 'MEDIUM', label: '중간' },
+  { value: 'LOW',    label: '낮음' },
+]
 
 export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
   const [title, setTitle] = useState('')
@@ -36,14 +43,14 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-20 p-4"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-20 p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <form
         onSubmit={handleSubmit}
-        className="bg-[#1a1a2e] rounded-xl p-6 w-full max-w-md shadow-xl"
+        className="bg-spotify-surface rounded-lg p-6 w-full max-w-md shadow-spotify-heavy border border-spotify-card"
       >
-        <h2 className="text-lg font-semibold text-gray-100 mb-4">새 할 일</h2>
+        <h2 className="text-sp-lg font-bold text-white mb-5">새 할 일</h2>
 
         <input
           autoFocus
@@ -51,61 +58,63 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
           placeholder="할 일을 입력하세요"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full bg-[#0f0f1a] border border-[#2d2d4e] rounded-lg px-4 py-2 text-gray-100 placeholder-gray-600 mb-3 focus:outline-none focus:border-violet-500"
+          className="w-full bg-spotify-elevated rounded-pill px-5 py-2.5 text-white text-sp-base placeholder-spotify-muted mb-3 focus:outline-none"
+          style={{ boxShadow: 'rgb(124,124,124) 0px 0px 0px 1px inset' }}
         />
 
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">우선순위</label>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as Priority)}
-              className="w-full bg-[#0f0f1a] border border-[#2d2d4e] rounded-lg px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-violet-500"
-            >
-              <option value="HIGH">높음</option>
-              <option value="MEDIUM">중간</option>
-              <option value="LOW">낮음</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">마감일</label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full bg-[#0f0f1a] border border-[#2d2d4e] rounded-lg px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-violet-500"
-            />
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="text-xs text-gray-500 mb-1 block">카테고리</label>
           <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="w-full bg-[#0f0f1a] border border-[#2d2d4e] rounded-lg px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-violet-500"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as Priority)}
+            className="bg-spotify-elevated border border-spotify-border rounded-pill px-4 py-2 text-white text-sp-sm focus:outline-none"
           >
-            <option value="">없음</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
+            {PRIORITY_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>{label}</option>
             ))}
           </select>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="bg-spotify-elevated border border-spotify-border rounded-pill px-4 py-2 text-spotify-muted text-sp-sm focus:outline-none"
+          />
         </div>
 
-        <div className="flex gap-3">
+        {categories.length > 0 && (
+          <div className="mb-5">
+            <p className="text-sp-xs text-spotify-muted uppercase tracking-sp-nav mb-2">카테고리</p>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCategoryId(categoryId === cat.id ? '' : cat.id)}
+                  className={`rounded-pill px-3 py-1 text-sp-sm font-bold transition-colors ${
+                    categoryId === cat.id
+                      ? 'text-white'
+                      : 'bg-spotify-elevated border border-spotify-border text-spotify-muted hover:text-white'
+                  }`}
+                  style={categoryId === cat.id ? { background: cat.color } : undefined}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-3 justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg border border-[#2d2d4e] text-gray-400 hover:text-gray-200 text-sm"
+            className="px-5 py-2 rounded-pill border border-[#7c7c7c] text-white text-sp-sm font-bold uppercase tracking-sp-btn hover:border-white transition-colors"
           >
             취소
           </button>
           <button
             type="submit"
             disabled={loading || !title.trim()}
-            className="flex-1 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-medium"
+            className="px-6 py-2 rounded-pill-lg bg-spotify-green text-black text-sp-sm font-bold uppercase tracking-sp-btn hover:bg-[#1fdf64] disabled:opacity-50 transition-colors"
           >
             추가
           </button>

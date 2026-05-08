@@ -1,3 +1,4 @@
+// components/TodoItem.tsx
 'use client'
 import type { Todo } from '@/types'
 
@@ -7,8 +8,8 @@ interface TodoItemProps {
   onDelete: (id: string) => void
 }
 
-const PRIORITY_COLORS = { HIGH: '#ef4444', MEDIUM: '#d97706', LOW: '#6b7280' }
-const PRIORITY_LABELS = { HIGH: '높음', MEDIUM: '중간', LOW: '낮음' }
+const PRIORITY_COLORS = { HIGH: '#f3727f', MEDIUM: '#ffa42b', LOW: '#535353' }
+const PRIORITY_LABELS = { HIGH: 'HIGH', MEDIUM: 'MED', LOW: 'LOW' }
 
 function formatDate(dateStr: string) {
   const date = new Date(dateStr)
@@ -23,44 +24,52 @@ function formatDate(dateStr: string) {
 export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   return (
     <div
-      className={`bg-[#1a1a2e] rounded-lg px-4 py-3 flex items-center gap-3 border-l-[3px] transition-opacity ${
-        todo.completed ? 'opacity-50' : ''
+      className={`grid grid-cols-[20px_1fr_90px_70px_20px] gap-3 px-3 py-2 rounded items-center group hover:bg-spotify-elevated transition-colors ${
+        todo.completed ? 'opacity-[0.45]' : ''
       }`}
-      style={{ borderColor: todo.completed ? '#374151' : PRIORITY_COLORS[todo.priority] }}
     >
       <button
         onClick={() => onToggle(todo.id, !todo.completed)}
         aria-label={todo.completed ? '완료 취소' : '완료'}
-        className={`w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition-colors ${
-          todo.completed ? 'bg-gray-600 border-gray-600' : 'border-gray-600 hover:border-violet-400'
+        className={`w-[14px] h-[14px] rounded-circle border-2 shrink-0 flex items-center justify-center transition-colors ${
+          todo.completed
+            ? 'bg-spotify-green border-spotify-green'
+            : 'border-spotify-border group-hover:border-spotify-green'
         }`}
       >
-        {todo.completed && <span className="text-gray-300 text-[10px]">✓</span>}
+        {todo.completed && (
+          <span className="text-black text-[8px] font-bold leading-none">✓</span>
+        )}
       </button>
 
-      <div className="flex-1 min-w-0">
-        <p className={`text-sm ${todo.completed ? 'text-gray-500 line-through' : 'text-gray-100'}`}>
+      <div className="overflow-hidden">
+        <p
+          className={`text-sp-base font-bold truncate ${
+            todo.completed ? 'line-through text-spotify-muted' : 'text-white'
+          }`}
+        >
           {todo.title}
         </p>
-        <div className="flex gap-2 mt-1 flex-wrap">
-          <span className="text-xs" style={{ color: PRIORITY_COLORS[todo.priority] }}>
-            ● {PRIORITY_LABELS[todo.priority]}
-          </span>
-          {todo.dueDate && (
-            <span className="text-xs text-gray-500">📅 {formatDate(todo.dueDate)}</span>
-          )}
-          {todo.category && (
-            <span className="text-xs" style={{ color: todo.category.color }}>
-              {todo.category.name}
-            </span>
-          )}
-        </div>
+        {todo.category && (
+          <p className="text-sp-xs text-spotify-muted truncate">{todo.category.name}</p>
+        )}
       </div>
+
+      <span className="text-sp-xs text-spotify-muted text-center">
+        {todo.dueDate ? formatDate(todo.dueDate) : '—'}
+      </span>
+
+      <span
+        className="text-sp-xs text-center font-bold"
+        style={{ color: PRIORITY_COLORS[todo.priority] }}
+      >
+        ● {PRIORITY_LABELS[todo.priority]}
+      </span>
 
       <button
         onClick={() => onDelete(todo.id)}
         aria-label="삭제"
-        className="text-gray-700 hover:text-red-400 text-sm shrink-0 transition-colors"
+        className="text-spotify-border hover:text-spotify-negative transition-colors text-xs opacity-0 group-hover:opacity-100"
       >
         ✕
       </button>
