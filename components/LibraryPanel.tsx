@@ -15,14 +15,13 @@ interface LibraryPanelProps {
 export function LibraryPanel({
   categories,
   totalTodos,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   activeView,
   activeCategoryId,
   onViewChange,
   onCategoryChange,
   onAddCategory,
 }: LibraryPanelProps) {
-  const isAllActive = activeCategoryId === null
+  const isAllActive = activeCategoryId === null && activeView === 'all'
 
   return (
     <aside className="hidden md:flex flex-col w-[220px] shrink-0 bg-spotify-base overflow-hidden border-r border-spotify-card">
