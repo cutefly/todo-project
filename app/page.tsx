@@ -50,16 +50,16 @@ export default function Home() {
     priority: Priority
     dueDate: string | null
     categoryId: string | null
-  }) => {
+  }): Promise<boolean> => {
     const res = await fetch('/api/todos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-    if (!res.ok) { toast.error('할 일을 추가하지 못했습니다'); return }
-    const todo = await res.json()
-    setTodos((prev) => [todo, ...prev])
+    if (!res.ok) { toast.error('할 일을 추가하지 못했습니다'); return false }
+    await fetchTodos()
     toast.success('할 일이 추가되었습니다')
+    return true
   }
 
   const handleToggle = async (id: string, completed: boolean) => {

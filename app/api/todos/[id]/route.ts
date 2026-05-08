@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { updateTodoSchema } from '@/lib/validations'
+import { Prisma } from '@/app/generated/prisma'
 
 export async function PATCH(
   request: Request,
@@ -22,7 +23,10 @@ export async function PATCH(
       include: { category: true },
     })
     return NextResponse.json(todo)
-  } catch {
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+      return NextResponse.json({ error: 'Todo not found' }, { status: 404 })
+    }
     return NextResponse.json({ error: 'Failed to update todo' }, { status: 500 })
   }
 }
@@ -34,7 +38,10 @@ export async function DELETE(
   try {
     await prisma.todo.delete({ where: { id: params.id } })
     return new NextResponse(null, { status: 204 })
-  } catch {
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+      return NextResponse.json({ error: 'Todo not found' }, { status: 404 })
+    }
     return NextResponse.json({ error: 'Failed to delete todo' }, { status: 500 })
   }
 }

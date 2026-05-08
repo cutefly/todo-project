@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { createCategorySchema } from '@/lib/validations'
+import { Prisma } from '@/app/generated/prisma'
 
 export async function GET() {
   try {
@@ -20,7 +21,10 @@ export async function POST(request: Request) {
     }
     const category = await prisma.category.create({ data: result.data })
     return NextResponse.json(category, { status: 201 })
-  } catch {
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+      return NextResponse.json({ error: '이미 존재하는 카테고리 이름입니다' }, { status: 409 })
+    }
     return NextResponse.json({ error: 'Failed to create category' }, { status: 500 })
   }
 }

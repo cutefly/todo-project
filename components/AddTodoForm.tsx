@@ -9,7 +9,7 @@ interface AddTodoFormProps {
     priority: Priority
     dueDate: string | null
     categoryId: string | null
-  }) => Promise<void>
+  }) => Promise<boolean>
   onClose: () => void
 }
 
@@ -24,14 +24,14 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
     e.preventDefault()
     if (!title.trim()) return
     setLoading(true)
-    await onAdd({
+    const success = await onAdd({
       title: title.trim(),
       priority,
       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
       categoryId: categoryId || null,
     })
     setLoading(false)
-    onClose()
+    if (success) onClose()
   }
 
   return (
