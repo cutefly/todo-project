@@ -3,7 +3,7 @@ import type { Config } from 'jest'
 const config: Config = {
   testEnvironment: 'node',
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {}],
+    '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tests/tsconfig.json' }],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
