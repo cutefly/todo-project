@@ -1,5 +1,13 @@
 // tests/e2e/todo.spec.ts
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function cleanupTodoByTitle(page: Page, title: string) {
+  const res = await page.request.get('/api/todos')
+  if (!res.ok()) return
+  const todos: { id: string; title: string }[] = await res.json()
+  const todo = todos.find((t) => t.title === title)
+  if (todo) await page.request.delete(`/api/todos/${todo.id}`)
+}
 
 test.describe('할 일 추가', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,10 +15,14 @@ test.describe('할 일 추가', () => {
   })
 
   test('새 할 일을 추가하면 목록에 표시된다', async ({ page }) => {
-    await page.click('[aria-label="새 할 일 추가"]')
-    await page.fill('input[placeholder="할 일을 입력하세요"]', 'E2E 테스트 할 일')
-    await page.getByRole('button', { name: '추가', exact: true }).click()
-    await expect(page.locator('text=E2E 테스트 할 일').first()).toBeVisible()
+    try {
+      await page.click('[aria-label="새 할 일 추가"]')
+      await page.fill('input[placeholder="할 일을 입력하세요"]', 'E2E 테스트 할 일')
+      await page.getByRole('button', { name: '추가', exact: true }).click()
+      await expect(page.locator('text=E2E 테스트 할 일').first()).toBeVisible()
+    } finally {
+      await cleanupTodoByTitle(page, 'E2E 테스트 할 일')
+    }
   })
 
   test('빈 제목으로는 추가 버튼이 비활성화된다', async ({ page }) => {
@@ -29,27 +41,35 @@ test.describe('할 일 추가', () => {
 test.describe('할 일 완료 토글', () => {
   test('체크박스 클릭 시 완료 상태로 변경된다', async ({ page }) => {
     await page.goto('/')
-    await page.click('[aria-label="새 할 일 추가"]')
-    await page.fill('input[placeholder="할 일을 입력하세요"]', '완료 테스트')
-    await page.getByRole('button', { name: '추가', exact: true }).click()
+    try {
+      await page.click('[aria-label="새 할 일 추가"]')
+      await page.fill('input[placeholder="할 일을 입력하세요"]', '완료 테스트')
+      await page.getByRole('button', { name: '추가', exact: true }).click()
 
-    const todoItem = page.locator('[aria-label="완료"]').first()
-    await todoItem.click()
-    const toggledContainer = page.locator('[aria-label="완료 취소"]').first().locator('..')
-    await expect(toggledContainer.locator('p').first()).toHaveCSS('text-decoration-line', 'line-through')
+      const todoItem = page.locator('[aria-label="완료"]').first()
+      await todoItem.click()
+      const toggledContainer = page.locator('[aria-label="완료 취소"]').first().locator('..')
+      await expect(toggledContainer.locator('p').first()).toHaveCSS('text-decoration-line', 'line-through')
+    } finally {
+      await cleanupTodoByTitle(page, '완료 테스트')
+    }
   })
 })
 
 test.describe('필터링', () => {
   test('높음 우선순위 필터 클릭 시 해당 항목만 표시된다', async ({ page }) => {
     await page.goto('/')
-    await page.click('[aria-label="새 할 일 추가"]')
-    await page.fill('input[placeholder="할 일을 입력하세요"]', '높음 우선순위 할 일')
-    await page.selectOption('select', { value: 'HIGH' })
-    await page.getByRole('button', { name: '추가', exact: true }).click()
+    try {
+      await page.click('[aria-label="새 할 일 추가"]')
+      await page.fill('input[placeholder="할 일을 입력하세요"]', '높음 우선순위 할 일')
+      await page.selectOption('select', { value: 'HIGH' })
+      await page.getByRole('button', { name: '추가', exact: true }).click()
 
-    await page.click('button:has-text("높음")')
-    await expect(page.locator('text=높음 우선순위 할 일').first()).toBeVisible()
+      await page.click('button:has-text("높음")')
+      await expect(page.locator('text=높음 우선순위 할 일').first()).toBeVisible()
+    } finally {
+      await cleanupTodoByTitle(page, '높음 우선순위 할 일')
+    }
   })
 })
 
