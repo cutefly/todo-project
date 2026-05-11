@@ -1,14 +1,21 @@
 // tests/e2e/todo.spec.ts
 import { test, expect, type Page } from '@playwright/test'
 
-async function cleanupTodoByTitle(page: Page, title: string) {
-  const res = await page.request.get('/api/todos')
-  if (!res.ok()) return
-  const todos: { id: string; title: string }[] = await res.json()
-  const matching = todos.filter((t) => t.title === title)
-  for (const todo of matching) {
-    await page.request.delete(`/api/todos/${todo.id}`)
-  }
+async function addTodoViaUI(
+  page: Page,
+  title: string,
+  options?: { priority?: string }
+): Promise<string> {
+  const responsePromise = page.waitForResponse(
+    (res) => res.url().includes('/api/todos') && res.request().method() === 'POST'
+  )
+  await page.locator('[aria-label="새 할 일 추가"]:visible').click()
+  await page.fill('input[placeholder="할 일을 입력하세요"]', title)
+  if (options?.priority) await page.selectOption('select', { value: options.priority })
+  await page.getByRole('button', { name: '추가', exact: true }).click()
+  const response = await responsePromise
+  const { id } = await response.json() as { id: string }
+  return id
 }
 
 test.describe('할 일 추가', () => {
@@ -17,13 +24,12 @@ test.describe('할 일 추가', () => {
   })
 
   test('새 할 일을 추가하면 목록에 표시된다', async ({ page }) => {
+    let todoId: string | undefined
     try {
-      await page.locator('[aria-label="새 할 일 추가"]:visible').click()
-      await page.fill('input[placeholder="할 일을 입력하세요"]', 'E2E 테스트 할 일')
-      await page.getByRole('button', { name: '추가', exact: true }).click()
+      todoId = await addTodoViaUI(page, 'E2E 테스트 할 일')
       await expect(page.locator('text=E2E 테스트 할 일').first()).toBeVisible()
     } finally {
-      await cleanupTodoByTitle(page, 'E2E 테스트 할 일')
+      if (todoId) await page.request.delete(`/api/todos/${todoId}`)
     }
   })
 
@@ -43,17 +49,16 @@ test.describe('할 일 추가', () => {
 test.describe('할 일 완료 토글', () => {
   test('체크박스 클릭 시 완료 상태로 변경된다', async ({ page }) => {
     await page.goto('/')
+    let todoId: string | undefined
     try {
-      await page.locator('[aria-label="새 할 일 추가"]:visible').click()
-      await page.fill('input[placeholder="할 일을 입력하세요"]', '완료 테스트')
-      await page.getByRole('button', { name: '추가', exact: true }).click()
+      todoId = await addTodoViaUI(page, '완료 테스트')
 
       const todoItem = page.locator('[aria-label="완료"]').first()
       await todoItem.click()
       const toggledContainer = page.locator('[aria-label="완료 취소"]').first().locator('..')
       await expect(toggledContainer.locator('p').first()).toHaveCSS('text-decoration-line', 'line-through')
     } finally {
-      await cleanupTodoByTitle(page, '완료 테스트')
+      if (todoId) await page.request.delete(`/api/todos/${todoId}`)
     }
   })
 })
@@ -61,16 +66,14 @@ test.describe('할 일 완료 토글', () => {
 test.describe('필터링', () => {
   test('높음 우선순위 필터 클릭 시 해당 항목만 표시된다', async ({ page }) => {
     await page.goto('/')
+    let todoId: string | undefined
     try {
-      await page.locator('[aria-label="새 할 일 추가"]:visible').click()
-      await page.fill('input[placeholder="할 일을 입력하세요"]', '높음 우선순위 할 일')
-      await page.selectOption('select', { value: 'HIGH' })
-      await page.getByRole('button', { name: '추가', exact: true }).click()
+      todoId = await addTodoViaUI(page, '높음 우선순위 할 일', { priority: 'HIGH' })
 
       await page.click('button:has-text("높음")')
       await expect(page.locator('text=높음 우선순위 할 일').first()).toBeVisible()
     } finally {
-      await cleanupTodoByTitle(page, '높음 우선순위 할 일')
+      if (todoId) await page.request.delete(`/api/todos/${todoId}`)
     }
   })
 })
