@@ -5,8 +5,10 @@ async function cleanupTodoByTitle(page: Page, title: string) {
   const res = await page.request.get('/api/todos')
   if (!res.ok()) return
   const todos: { id: string; title: string }[] = await res.json()
-  const todo = todos.find((t) => t.title === title)
-  if (todo) await page.request.delete(`/api/todos/${todo.id}`)
+  const matching = todos.filter((t) => t.title === title)
+  for (const todo of matching) {
+    await page.request.delete(`/api/todos/${todo.id}`)
+  }
 }
 
 test.describe('할 일 추가', () => {
