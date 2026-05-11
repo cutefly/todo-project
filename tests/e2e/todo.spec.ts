@@ -16,7 +16,7 @@ test.describe('할 일 추가', () => {
 
   test('새 할 일을 추가하면 목록에 표시된다', async ({ page }) => {
     try {
-      await page.click('[aria-label="새 할 일 추가"]')
+      await page.locator('[aria-label="새 할 일 추가"]:visible').click()
       await page.fill('input[placeholder="할 일을 입력하세요"]', 'E2E 테스트 할 일')
       await page.getByRole('button', { name: '추가', exact: true }).click()
       await expect(page.locator('text=E2E 테스트 할 일').first()).toBeVisible()
@@ -26,12 +26,12 @@ test.describe('할 일 추가', () => {
   })
 
   test('빈 제목으로는 추가 버튼이 비활성화된다', async ({ page }) => {
-    await page.click('[aria-label="새 할 일 추가"]')
+    await page.locator('[aria-label="새 할 일 추가"]:visible').click()
     await expect(page.getByRole('button', { name: '추가', exact: true })).toBeDisabled()
   })
 
   test('취소 버튼을 누르면 모달이 닫힌다', async ({ page }) => {
-    await page.click('[aria-label="새 할 일 추가"]')
+    await page.locator('[aria-label="새 할 일 추가"]:visible').click()
     await expect(page.locator('form h2')).toBeVisible()
     await page.click('button:has-text("취소")')
     await expect(page.locator('form h2')).not.toBeVisible()
@@ -42,7 +42,7 @@ test.describe('할 일 완료 토글', () => {
   test('체크박스 클릭 시 완료 상태로 변경된다', async ({ page }) => {
     await page.goto('/')
     try {
-      await page.click('[aria-label="새 할 일 추가"]')
+      await page.locator('[aria-label="새 할 일 추가"]:visible').click()
       await page.fill('input[placeholder="할 일을 입력하세요"]', '완료 테스트')
       await page.getByRole('button', { name: '추가', exact: true }).click()
 
@@ -60,7 +60,7 @@ test.describe('필터링', () => {
   test('높음 우선순위 필터 클릭 시 해당 항목만 표시된다', async ({ page }) => {
     await page.goto('/')
     try {
-      await page.click('[aria-label="새 할 일 추가"]')
+      await page.locator('[aria-label="새 할 일 추가"]:visible').click()
       await page.fill('input[placeholder="할 일을 입력하세요"]', '높음 우선순위 할 일')
       await page.selectOption('select', { value: 'HIGH' })
       await page.getByRole('button', { name: '추가', exact: true }).click()
@@ -77,9 +77,9 @@ test.describe('다크/라이트 모드 토글', () => {
   test('테마 토글 버튼 클릭 시 html 클래스가 변경된다', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('html')).toHaveClass(/dark/)
-    await page.click('[aria-label="테마 전환"]')
+    await page.locator('[aria-label="테마 전환"]:visible').click()
     await expect(page.locator('html')).not.toHaveClass(/dark/)
-    await page.click('[aria-label="테마 전환"]')
+    await page.locator('[aria-label="테마 전환"]:visible').click()
     await expect(page.locator('html')).toHaveClass(/dark/)
   })
 })
