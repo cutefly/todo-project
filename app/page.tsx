@@ -10,6 +10,7 @@ import { LibraryPanel } from '@/components/LibraryPanel'
 import { ProgressBar } from '@/components/ProgressBar'
 import { BottomTabBar } from '@/components/BottomTabBar'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { EditTodoModal } from '@/components/EditTodoModal'
 
 const PRIORITY_OPTIONS: { value: Priority | null; label: string }[] = [
   { value: null,     label: '전체' },
@@ -33,6 +34,7 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false)
   const [showMobileLibrary, setShowMobileLibrary] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null)
 
   const fetchTodos = useCallback(async () => {
     const params = new URLSearchParams()
@@ -90,8 +92,20 @@ export default function Home() {
     setTodos((prev) => prev.filter((t) => t.id !== id))
   }
 
-  const handleEdit = (_todo: Todo) => {
-    // TODO: open EditTodoModal (Task 3)
+  const handleEditSave = async (
+    id: string,
+    data: { title: string; priority: Priority; dueDate: string | null; categoryId: string | null }
+  ): Promise<boolean> => {
+    const res = await fetch(`/api/todos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    if (!res.ok) { toast.error('수정에 실패했습니다'); return false }
+    const updated: Todo = await res.json()
+    setTodos((prev) => prev.map((t) => (t.id === id ? updated : t)))
+    toast.success('할 일이 수정되었습니다')
+    return true
   }
 
   const handleAddCategory = async () => {
@@ -177,7 +191,7 @@ export default function Home() {
                 불러오는 중...
               </div>
             ) : (
-              <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onEdit={handleEdit} />
+              <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onEdit={setEditingTodo} />
             )}
           </div>
         </main>
@@ -264,6 +278,15 @@ export default function Home() {
           categories={categories}
           onAdd={handleAdd}
           onClose={() => setShowForm(false)}
+        />
+      )}
+
+      {editingTodo && (
+        <EditTodoModal
+          todo={editingTodo}
+          categories={categories}
+          onSave={handleEditSave}
+          onClose={() => setEditingTodo(null)}
         />
       )}
     </div>
