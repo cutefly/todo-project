@@ -108,3 +108,48 @@ test.describe('모바일 레이아웃', () => {
     await expect(page.locator('nav button:has-text("오늘") span').last()).toHaveCSS('color', 'rgb(30, 215, 96)')
   })
 })
+
+test.describe('할 일 수정', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+  })
+
+  test('수정 버튼 클릭 시 모달이 열린다', async ({ page }) => {
+    let todoId: string | undefined
+    try {
+      todoId = await addTodoViaUI(page, '수정 모달 테스트')
+      await page.locator('[aria-label="수정"]:visible').first().click()
+      await expect(page.locator('form h2')).toHaveText('할 일 수정')
+      await page.click('button:has-text("취소")')
+    } finally {
+      if (todoId) await page.request.delete(`/api/todos/${todoId}`)
+    }
+  })
+
+  test('제목을 수정하고 저장하면 목록에 반영된다', async ({ page }) => {
+    let todoId: string | undefined
+    try {
+      todoId = await addTodoViaUI(page, '수정 전 제목')
+      await page.locator('[aria-label="수정"]:visible').first().click()
+      await page.fill('input[placeholder="할 일을 입력하세요"]', '수정 후 제목')
+      await page.getByRole('button', { name: '저장', exact: true }).click()
+      await expect(page.locator('text=수정 후 제목').first()).toBeVisible()
+    } finally {
+      if (todoId) await page.request.delete(`/api/todos/${todoId}`)
+    }
+  })
+
+  test('취소 버튼을 누르면 모달이 닫히고 내용이 변경되지 않는다', async ({ page }) => {
+    let todoId: string | undefined
+    try {
+      todoId = await addTodoViaUI(page, '변경되지 않을 제목')
+      await page.locator('[aria-label="수정"]:visible').first().click()
+      await page.fill('input[placeholder="할 일을 입력하세요"]', '변경된 제목')
+      await page.click('button:has-text("취소")')
+      await expect(page.locator('form h2')).not.toBeVisible()
+      await expect(page.locator('text=변경되지 않을 제목').first()).toBeVisible()
+    } finally {
+      if (todoId) await page.request.delete(`/api/todos/${todoId}`)
+    }
+  })
+})
