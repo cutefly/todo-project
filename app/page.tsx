@@ -90,6 +90,10 @@ export default function Home() {
     setTodos((prev) => prev.filter((t) => t.id !== id))
   }
 
+  const handleEdit = (_todo: Todo) => {
+    // TODO: open EditTodoModal (Task 3)
+  }
+
   const handleAddCategory = async () => {
     const name = prompt('카테고리 이름을 입력하세요')
     if (!name?.trim()) return
@@ -173,7 +177,7 @@ export default function Home() {
                 불러오는 중...
               </div>
             ) : (
-              <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} />
+              <TodoList todos={todos} onToggle={handleToggle} onDelete={handleDelete} onEdit={handleEdit} />
             )}
           </div>
         </main>

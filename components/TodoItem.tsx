@@ -6,6 +6,7 @@ interface TodoItemProps {
   todo: Todo
   onToggle: (id: string, completed: boolean) => void
   onDelete: (id: string) => void
+  onEdit: (todo: Todo) => void
 }
 
 const PRIORITY_COLORS = { HIGH: '#f3727f', MEDIUM: '#ffa42b', LOW: '#535353' }
@@ -21,10 +22,10 @@ function formatDate(dateStr: string) {
   return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
 }
 
-export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
   return (
     <div
-      className={`grid grid-cols-[20px_1fr_90px_70px_20px] gap-3 px-3 py-2 rounded items-center group hover:bg-spotify-elevated transition-colors ${
+      className={`grid grid-cols-[20px_1fr_90px_70px_24px_24px] gap-3 px-3 py-2 rounded items-center group hover:bg-spotify-elevated transition-colors ${
         todo.completed ? 'opacity-[0.45]' : ''
       }`}
     >
@@ -72,6 +73,14 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         className="text-spotify-border hover:text-spotify-negative transition-colors text-xs opacity-0 group-hover:opacity-100"
       >
         ✕
+      </button>
+
+      <button
+        onClick={() => onEdit(todo)}
+        aria-label="수정"
+        className="text-spotify-border hover:text-spotify-green transition-colors text-xs"
+      >
+        ✏
       </button>
     </div>
   )
