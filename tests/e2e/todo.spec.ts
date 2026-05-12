@@ -132,7 +132,11 @@ test.describe('할 일 수정', () => {
       todoId = await addTodoViaUI(page, '수정 전 제목')
       await page.locator('[aria-label="수정"]:visible').first().click()
       await page.fill('input[placeholder="할 일을 입력하세요"]', '수정 후 제목')
+      const patchPromise = page.waitForResponse(
+        (res) => res.url().includes('/api/todos') && res.request().method() === 'PATCH'
+      )
       await page.getByRole('button', { name: '저장', exact: true }).click()
+      await patchPromise
       await expect(page.locator('text=수정 후 제목').first()).toBeVisible()
     } finally {
       if (todoId) await page.request.delete(`/api/todos/${todoId}`)
