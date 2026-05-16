@@ -142,9 +142,9 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen bg-spotify-base">
       {/* Mobile header */}
-      <header className="md:hidden bg-black px-4 py-3 flex items-center justify-between shrink-0">
+      <header className="md:hidden bg-spotify-sidebar px-4 py-3 flex items-center justify-between shrink-0">
         <span className="text-spotify-green font-black text-lg">✓</span>
-        <span className="text-sp-base font-bold text-white">{currentTitle}</span>
+        <span className="text-sp-base font-bold text-spotify-text">{currentTitle}</span>
         <ThemeToggle />
       </header>
 
@@ -167,7 +167,7 @@ export default function Home() {
 
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="px-5 pt-5 pb-3 shrink-0">
-            <h1 className="text-sp-xl font-bold text-white mb-3">{currentTitle}</h1>
+            <h1 className="text-sp-xl font-bold text-spotify-text mb-3">{currentTitle}</h1>
             <div className="flex gap-2 flex-wrap">
               {PRIORITY_OPTIONS.map(({ value, label }) => (
                 <button
@@ -175,7 +175,7 @@ export default function Home() {
                   onClick={() => setPriorityFilter(value)}
                   className={`text-sp-xs px-3 py-1 rounded-pill transition-colors font-bold ${
                     priorityFilter === value
-                      ? 'bg-spotify-elevated text-white'
+                      ? 'bg-spotify-elevated text-spotify-text'
                       : 'bg-transparent text-spotify-muted border border-spotify-border hover:text-white'
                   }`}
                 >
@@ -223,8 +223,8 @@ export default function Home() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-spotify-card">
-              <span className="text-sp-base font-bold text-white">내 라이브러리</span>
-              <button onClick={() => setShowMobileLibrary(false)} className="text-spotify-muted hover:text-white text-xl">✕</button>
+              <span className="text-sp-base font-bold text-spotify-text">내 라이브러리</span>
+              <button onClick={() => setShowMobileLibrary(false)} className="text-spotify-muted hover:text-spotify-text text-xl">✕</button>
             </div>
             <div className="overflow-y-auto p-2 pb-6">
               <button
@@ -235,7 +235,7 @@ export default function Home() {
               >
                 <div className="w-9 h-9 rounded bg-spotify-card flex items-center justify-center shrink-0 text-base">⊞</div>
                 <div className="text-left">
-                  <p className="text-sp-sm font-bold text-white">전체 할 일</p>
+                  <p className="text-sp-sm font-bold text-spotify-text">전체 할 일</p>
                   <p className="text-sp-xs text-spotify-muted">{todos.length}개 항목</p>
                 </div>
               </button>
@@ -254,7 +254,7 @@ export default function Home() {
                     {cat.name.charAt(0)}
                   </div>
                   <div className="text-left">
-                    <p className="text-sp-sm font-bold text-white">{cat.name}</p>
+                    <p className="text-sp-sm font-bold text-spotify-text">{cat.name}</p>
                     <p className="text-sp-xs text-spotify-muted">카테고리</p>
                   </div>
                 </button>

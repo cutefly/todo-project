@@ -50,7 +50,7 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
         onSubmit={handleSubmit}
         className="bg-spotify-surface rounded-lg p-6 w-full max-w-md shadow-spotify-heavy border border-spotify-card"
       >
-        <h2 className="text-sp-lg font-bold text-white mb-5">새 할 일</h2>
+        <h2 className="text-sp-lg font-bold text-spotify-text mb-5">새 할 일</h2>
 
         <input
           autoFocus
@@ -58,15 +58,15 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
           placeholder="할 일을 입력하세요"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full bg-spotify-elevated rounded-pill px-5 py-2.5 text-white text-sp-base placeholder-spotify-muted mb-3 focus:outline-none"
-          style={{ boxShadow: 'rgb(124,124,124) 0px 0px 0px 1px inset' }}
+          className="w-full bg-spotify-elevated rounded-pill px-5 py-2.5 text-spotify-text text-sp-base placeholder-spotify-muted mb-3 focus:outline-none"
+          style={{ boxShadow: '0 0 0 1px var(--sp-border) inset' }}
         />
 
         <div className="grid grid-cols-2 gap-3 mb-3">
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value as Priority)}
-            className="bg-spotify-elevated border border-spotify-border rounded-pill px-4 py-2 text-white text-sp-sm focus:outline-none"
+            className="bg-spotify-elevated border border-spotify-border rounded-pill px-4 py-2 text-spotify-text text-sp-sm focus:outline-none"
           >
             {PRIORITY_OPTIONS.map(({ value, label }) => (
               <option key={value} value={value}>{label}</option>
@@ -92,7 +92,7 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
                   className={`rounded-pill px-3 py-1 text-sp-sm font-bold transition-colors ${
                     categoryId === cat.id
                       ? 'text-white'
-                      : 'bg-spotify-elevated border border-spotify-border text-spotify-muted hover:text-white'
+                      : 'bg-spotify-elevated border border-spotify-border text-spotify-muted hover:text-spotify-text'
                   }`}
                   style={categoryId === cat.id ? { background: cat.color } : undefined}
                 >
@@ -107,7 +107,7 @@ export function AddTodoForm({ categories, onAdd, onClose }: AddTodoFormProps) {
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 rounded-pill border border-[#7c7c7c] text-white text-sp-sm font-bold uppercase tracking-sp-btn hover:border-white transition-colors"
+            className="px-5 py-2 rounded-pill border border-spotify-border text-spotify-text text-sp-sm font-bold uppercase tracking-sp-btn hover:border-spotify-text transition-colors"
           >
             취소
           </button>

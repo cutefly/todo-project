@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={`${notoSansKR.className} bg-spotify-base text-white min-h-screen`}>
+      <body className={`${notoSansKR.className} bg-spotify-base text-spotify-text min-h-screen`}>
         {children}
         <Toaster position="bottom-right" />
       </body>

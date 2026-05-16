@@ -46,7 +46,7 @@ export function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
       <div className="overflow-hidden">
         <p
           className={`text-sp-base font-bold truncate ${
-            todo.completed ? 'line-through text-spotify-muted' : 'text-white'
+            todo.completed ? 'line-through text-spotify-muted' : 'text-spotify-text'
           }`}
         >
           {todo.title}
