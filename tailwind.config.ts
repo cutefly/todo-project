@@ -12,15 +12,17 @@ const config: Config = {
     extend: {
       colors: {
         spotify: {
-          base:     '#121212',
-          surface:  '#181818',
-          elevated: '#1f1f1f',
-          card:     '#282828',
-          green:    '#1ed760',
-          muted:    '#b3b3b3',
-          border:   '#535353',
-          negative: '#f3727f',
-          warning:  '#ffa42b',
+          base:     'var(--sp-base)',
+          surface:  'var(--sp-surface)',
+          elevated: 'var(--sp-elevated)',
+          card:     'var(--sp-card)',
+          sidebar:  'var(--sp-sidebar)',
+          green:    'var(--sp-green)',
+          muted:    'var(--sp-muted)',
+          border:   'var(--sp-border)',
+          negative: 'var(--sp-negative)',
+          warning:  'var(--sp-warning)',
+          text:     'var(--sp-text)',
         },
       },
       borderRadius: {

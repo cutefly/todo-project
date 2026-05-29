@@ -19,7 +19,7 @@ export function IconSidebar({ activeView, activeCategoryId, onViewChange }: Icon
   const isActive = (view: View) => activeView === view && !activeCategoryId
 
   return (
-    <div className="hidden md:flex flex-col items-center w-[62px] shrink-0 bg-black py-4 gap-0.5">
+    <div className="hidden md:flex flex-col items-center w-[62px] shrink-0 bg-spotify-sidebar py-4 gap-0.5">
       <span className="text-spotify-green text-lg font-black mb-4">✓</span>
 
       {NAV_ITEMS.map(({ view, icon, label }) => (
@@ -37,7 +37,7 @@ export function IconSidebar({ activeView, activeCategoryId, onViewChange }: Icon
           </div>
           <span
             className={`text-sp-xs transition-colors ${
-              isActive(view) ? 'text-white font-bold' : 'text-spotify-muted'
+              isActive(view) ? 'text-spotify-text font-bold' : 'text-spotify-muted'
             }`}
           >
             {label}

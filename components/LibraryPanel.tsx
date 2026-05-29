@@ -26,11 +26,11 @@ export function LibraryPanel({
   return (
     <aside className="hidden md:flex flex-col w-[220px] shrink-0 bg-spotify-base overflow-hidden border-r border-spotify-card">
       <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-sp-base font-bold text-white">내 라이브러리</span>
+        <span className="text-sp-base font-bold text-spotify-text">내 라이브러리</span>
         <button
           onClick={onAddCategory}
           aria-label="카테고리 추가"
-          className="text-spotify-muted hover:text-white transition-colors text-xl leading-none"
+          className="text-spotify-muted hover:text-spotify-text transition-colors text-xl leading-none"
         >
           +
         </button>
@@ -48,7 +48,7 @@ export function LibraryPanel({
             ⊞
           </div>
           <div className="text-left overflow-hidden">
-            <p className="text-sp-sm font-bold text-white truncate">전체 할 일</p>
+            <p className="text-sp-sm font-bold text-spotify-text truncate">전체 할 일</p>
             <p className="text-sp-xs text-spotify-muted">{totalTodos}개 항목</p>
           </div>
         </button>
@@ -68,7 +68,7 @@ export function LibraryPanel({
               {cat.name.charAt(0)}
             </div>
             <div className="text-left overflow-hidden">
-              <p className="text-sp-sm font-bold text-white truncate">{cat.name}</p>
+              <p className="text-sp-sm font-bold text-spotify-text truncate">{cat.name}</p>
               <p className="text-sp-xs text-spotify-muted">카테고리</p>
             </div>
           </button>

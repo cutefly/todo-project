@@ -10,7 +10,7 @@ async function addTodoViaUI(
     (res) => res.url().includes('/api/todos') && res.request().method() === 'POST'
   )
   await page.locator('[aria-label="새 할 일 추가"]:visible').click()
-  await page.fill('input[placeholder="할 일을 입력하세요"]', title)
+  await page.locator('input[placeholder="할 일을 입력하세요"]').pressSequentially(title)
   if (options?.priority) await page.selectOption('select', { value: options.priority })
   await page.getByRole('button', { name: '추가', exact: true }).click()
   const response = await responsePromise
@@ -131,7 +131,8 @@ test.describe('할 일 수정', () => {
     try {
       todoId = await addTodoViaUI(page, '수정 전 제목')
       await page.locator('[aria-label="수정"]:visible').first().click()
-      await page.fill('input[placeholder="할 일을 입력하세요"]', '수정 후 제목')
+      await page.locator('input[placeholder="할 일을 입력하세요"]').clear()
+      await page.locator('input[placeholder="할 일을 입력하세요"]').pressSequentially('수정 후 제목')
       const patchPromise = page.waitForResponse(
         (res) => res.url().includes('/api/todos') && res.request().method() === 'PATCH'
       )
@@ -148,7 +149,8 @@ test.describe('할 일 수정', () => {
     try {
       todoId = await addTodoViaUI(page, '변경되지 않을 제목')
       await page.locator('[aria-label="수정"]:visible').first().click()
-      await page.fill('input[placeholder="할 일을 입력하세요"]', '변경된 제목')
+      await page.locator('input[placeholder="할 일을 입력하세요"]').clear()
+      await page.locator('input[placeholder="할 일을 입력하세요"]').pressSequentially('변경된 제목')
       await page.click('button:has-text("취소")')
       await expect(page.locator('form h2')).not.toBeVisible()
       await expect(page.locator('text=변경되지 않을 제목').first()).toBeVisible()

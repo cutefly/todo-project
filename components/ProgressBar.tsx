@@ -23,7 +23,7 @@ export function ProgressBar({ activeView, categoryName, total, completed, onAdd 
   return (
     <div className="hidden md:flex items-center gap-4 bg-spotify-surface border-t border-spotify-card shadow-spotify-bottom px-4 py-3 shrink-0">
       <div className="w-48 shrink-0">
-        <p className="text-sp-base font-bold text-white truncate">{label}</p>
+        <p className="text-sp-base font-bold text-spotify-text truncate">{label}</p>
         <p className="text-sp-xs text-spotify-muted">{completed} / {total} 완료</p>
       </div>
 
